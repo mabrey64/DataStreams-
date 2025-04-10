@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class FrameStream extends JFrame
 {
@@ -66,6 +69,14 @@ public class FrameStream extends JFrame
         textAreaPanel = new JPanel();
         textAreaPanel.setLayout(new FlowLayout());
 
+        // Set the text areas to be non-editable
+        fileDisplayArea.setEditable(false);
+        resultTextArea.setEditable(false);
+        JPanel fileDisplayPanel = new JPanel();
+        fileDisplayPanel.setLayout(new BorderLayout());
+        JLabel fileDisplayLabel = new JLabel("Original File Content:");
+        fileDisplayPanel.add(fileDisplayLabel, BorderLayout.NORTH);
+        fileDisplayPanel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
         // Add the file display area and result text area to the panel
         textAreaPanel.add(new JScrollPane(fileDisplayArea));
         textAreaPanel.add(new JScrollPane(resultTextArea));
@@ -83,11 +94,16 @@ public class FrameStream extends JFrame
 
         // Initialize the buttons and add action listeners
         chooseFileButton = new JButton("Choose File");
-        //chooseFileButton.addActionListener(e -> chooseFile());
+        chooseFileButton.addActionListener(e -> chooseFile());
 
 
         exitButton = new JButton("Exit");
-        exitButton.addActionListener(e -> System.exit(0));
+        exitButton.addActionListener(e -> {
+            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
 
         // Add buttons to the button panel
         buttonPanel.add(chooseFileButton);
@@ -105,11 +121,26 @@ public class FrameStream extends JFrame
         if (returnValue == JFileChooser.APPROVE_OPTION)
         {
             selectedFile = fileChooser.getSelectedFile();
-            fileDisplayArea.setText("Selected file: " + selectedFile.getAbsolutePath());
             // Load the file content into the text area
-            //loadFileContent(selectedFile);
+            loadFileContent(selectedFile, fileDisplayArea);
         }
     }
 
-
+    private void loadFileContent(File selectedFile, JTextArea fileDisplayArea)
+    {
+        // Clear the text area before loading new content
+        fileDisplayArea.setText("");
+        try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile)))
+        {
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                fileDisplayArea.append(line + "\n");
+            }
+        }
+        catch (IOException e)
+        {
+            JOptionPane.showMessageDialog(this, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }
