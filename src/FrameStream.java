@@ -67,19 +67,25 @@ public class FrameStream extends JFrame
     {
         // Initialize the text area panel and set its layout
         textAreaPanel = new JPanel();
-        textAreaPanel.setLayout(new FlowLayout());
+        textAreaPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         // Set the text areas to be non-editable
         fileDisplayArea.setEditable(false);
         resultTextArea.setEditable(false);
-        JPanel fileDisplayPanel = new JPanel();
-        fileDisplayPanel.setLayout(new BorderLayout());
-        JLabel fileDisplayLabel = new JLabel("Original File Content:");
-        fileDisplayPanel.add(fileDisplayLabel, BorderLayout.NORTH);
+
+        // Create a panel for the file display area with a titled border
+        JPanel fileDisplayPanel = new JPanel(new BorderLayout());
+        fileDisplayPanel.setBorder(BorderFactory.createTitledBorder("Original File Content"));
         fileDisplayPanel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
-        // Add the file display area and result text area to the panel
-        textAreaPanel.add(new JScrollPane(fileDisplayArea));
-        textAreaPanel.add(new JScrollPane(resultTextArea));
+
+        // Create a panel for the result text area with a titled border
+        JPanel resultDisplayPanel = new JPanel(new BorderLayout());
+        resultDisplayPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
+        resultDisplayPanel.add(new JScrollPane(resultTextArea), BorderLayout.CENTER);
+
+        // Add the panels to the text area panel
+        textAreaPanel.add(fileDisplayPanel);
+        textAreaPanel.add(resultDisplayPanel);
 
         // Add the text area panel to the main panel
         mainFramePanel.add(textAreaPanel);
@@ -96,6 +102,12 @@ public class FrameStream extends JFrame
         chooseFileButton = new JButton("Choose File");
         chooseFileButton.addActionListener(e -> chooseFile());
 
+        searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> {
+            // Create an instance of FilterStream and call the filtering method
+            FilterStream filterStream = new FilterStream(selectedFile, this);
+            filterStream.filteringFile(this);
+        });
 
         exitButton = new JButton("Exit");
         exitButton.addActionListener(e -> {
@@ -142,5 +154,16 @@ public class FrameStream extends JFrame
         {
             JOptionPane.showMessageDialog(this, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public JTextField setSearchTextField(String text)
+    {
+        searchTextField.setText(text);
+        return searchTextField;
+    }
+
+    public JTextField getSearchTextField()
+    {
+        return searchTextField;
     }
 }
