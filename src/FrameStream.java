@@ -44,6 +44,13 @@ public class FrameStream extends JFrame
         //searchButton.addActionListener(e -> searchString());
 
         searchPanel.add(new JLabel("Enter string to search:"));
+        searchButton.addActionListener(e -> {
+            // Create an instance of FilterStream and call the filtering method
+            String searchText = searchTextField.getText();
+            FilterStream filterStream = new FilterStream(selectedFile, this, searchText);
+            filterStream.filteringFile(this);
+        });
+
         searchPanel.add(searchTextField);
         searchPanel.add(searchButton);
 
@@ -101,13 +108,6 @@ public class FrameStream extends JFrame
         // Initialize the buttons and add action listeners
         chooseFileButton = new JButton("Choose File");
         chooseFileButton.addActionListener(e -> chooseFile());
-
-        searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> {
-            // Create an instance of FilterStream and call the filtering method
-            FilterStream filterStream = new FilterStream(selectedFile, this);
-            filterStream.filteringFile(this);
-        });
 
         exitButton = new JButton("Exit");
         exitButton.addActionListener(e -> {
